@@ -88,9 +88,25 @@ class ViewController: UIViewController {
     }
     
     @IBAction func backspaceClicked() {
+        if waitingForOperand {
+            return
+        }
+        
+        var strValue = display.text!
+        display.text = dropLast(strValue)
+        if display.text!.isEmpty {
+            displayValue = 0.0
+            waitingForOperand = true
+        }
     }
     
     @IBAction func clear() {
+        if waitingForOperand {
+            return
+        }
+        
+        displayValue = 0
+        waitingForOperand = true
     }
     
     @IBAction func clearAll() {

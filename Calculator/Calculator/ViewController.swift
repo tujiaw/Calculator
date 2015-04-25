@@ -20,10 +20,15 @@ class ViewController: UIViewController {
     
     var displayValue: Double {
         set {
-            display.text = "\(newValue)"
+            let intValue = Int(newValue)
+            if (Double(intValue) == newValue) {
+                display.text = "\(intValue)"
+            } else {
+                display.text = "\(newValue)"
+            }
         }
         get {
-            return NSNumberFormatter().numberFromString(display.text!)!.doubleValue
+            return (display.text! as NSString).doubleValue
         }
     }
     
@@ -79,6 +84,7 @@ class ViewController: UIViewController {
     }
 
     @IBAction func changeSignClicked() {
+        displayValue *= -1
     }
     
     @IBAction func backspaceClicked() {
@@ -116,22 +122,77 @@ class ViewController: UIViewController {
     }
     
     @IBAction func multiplicativeOperatorClicked(sender: UIButton) {
+        var clickedOperator = sender.currentTitle!
+        var operand = displayValue
+        if !pendingMultiplicativeOperator.isEmpty {
+            if !calculate(operand, pendingOperator: pendingMultiplicativeOperator) {
+                abortOperation()
+                return
+            }
+            displayValue = factorSoFar
+        } else {
+            factorSoFar = operand
+        }
+        
+        pendingMultiplicativeOperator = clickedOperator
+        waitingForOperand = true
     }
     
     @IBAction func additiveOperatorClicked(sender: UIButton) {
         let clickedOperator = sender.currentTitle!
         var operand = displayValue
         if !pendingMultiplicativeOperator.isEmpty {
-            if calculate(operand, pendingOperator: pendingMultiplicativeOperator) {
-                
+            if !calculate(operand, pendingOperator: pendingMultiplicativeOperator) {
+                abortOperation()
+                return
             }
+            displayValue = factorSoFar
+            factorSoFar = 0.0
+            pendingMultiplicativeOperator = ""
         }
+        
+        if !pendingAdditiveOperator.isEmpty {
+            if !calculate(operand, pendingOperator: pendingAdditiveOperator) {
+                abortOperation()
+                return
+            }
+            displayValue = sumSoFar
+        } else {
+            sumSoFar = operand
+        }
+        
+        pendingAdditiveOperator = clickedOperator
+        waitingForOperand = true
     }
     
     @IBAction func unaryOperatorClicked(sender: UIButton) {
     }
     
     @IBAction func equalClicked() {
+        var operand = displayValue
+        if !pendingMultiplicativeOperator.isEmpty {
+            if !calculate(operand, pendingOperator: pendingMultiplicativeOperator) {
+                abortOperation()
+                return
+            }
+            operand = factorSoFar
+            factorSoFar = 0.0
+            pendingMultiplicativeOperator = ""
+        }
+        
+        if !pendingAdditiveOperator.isEmpty {
+            if !calculate(operand, pendingOperator: pendingAdditiveOperator) {
+                abortOperation()
+                return
+            }
+            pendingAdditiveOperator = ""
+        } else {
+            sumSoFar = operand
+        }
+        
+        displayValue = sumSoFar
+        sumSoFar = 0.0
+        waitingForOperand = true
     }
 }
 

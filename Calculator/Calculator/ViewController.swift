@@ -11,9 +11,9 @@ import UIKit
 class ViewController: UIViewController {
 
     @IBOutlet weak var display: UILabel!
-    var sumInMemory: Double = 0
-    var sumSoFar: Double = 0
-    var factorSoFar: Double = 0
+    var sumInMemory: Double = 0.0
+    var sumSoFar: Double = 0.0
+    var factorSoFar: Double = 0.0
     var pendingAdditiveOperator = ""
     var pendingMultiplicativeOperator = ""
     var waitingForOperand = true
@@ -60,6 +60,11 @@ class ViewController: UIViewController {
         return result
      }
     
+    func abortOperation() {
+        clearAll()
+        display.text = "####"
+    }
+    
     @IBAction func digitClicked(sender: UIButton) {
         let digitValue = sender.currentTitle?.toInt()
         if display.text!.toInt() == 0 && digitValue == 0 {
@@ -83,18 +88,31 @@ class ViewController: UIViewController {
     }
     
     @IBAction func clearAll() {
+        sumSoFar = 0.0
+        factorSoFar = 0.0
+        pendingAdditiveOperator = ""
+        pendingMultiplicativeOperator = ""
+        displayValue = 0.0
+        waitingForOperand = true
     }
     
     @IBAction func clearMemory() {
+        sumInMemory = 0.0
     }
     
     @IBAction func readMemory() {
+        displayValue = sumInMemory
+        waitingForOperand = true
     }
     
     @IBAction func setMemory() {
+        equalClicked()
+        sumInMemory = displayValue
     }
     
     @IBAction func addToMemory() {
+        equalClicked()
+        sumInMemory += displayValue
     }
     
     @IBAction func multiplicativeOperatorClicked(sender: UIButton) {
@@ -104,7 +122,9 @@ class ViewController: UIViewController {
         let clickedOperator = sender.currentTitle!
         var operand = displayValue
         if !pendingMultiplicativeOperator.isEmpty {
-            
+            if calculate(operand, pendingOperator: pendingMultiplicativeOperator) {
+                
+            }
         }
     }
     
